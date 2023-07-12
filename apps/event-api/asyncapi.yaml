@@ -1,0 +1,48 @@
+asyncapi: '2.6.0'
+info:
+  title: Deep Flow Service
+  version: 1.0.0
+  description: | 
+    This service is in charge of streaming deep flow events for a given user
+
+    You can quickly play with the API using [websocat](https://github.com/vi/websocat#installation) like this:
+
+    ```bash
+    websocat wss://localhost:3002/v1/users/samz -S
+    ```
+
+servers:
+  public:
+    url: wss://localhost:3002
+    protocol: wss
+
+channels:
+  /v1/users/{user}:
+    parameters:
+      user:
+        description: A given user
+        schema:
+          type: string
+          example: samz
+    subscribe:
+      message:
+        $ref: '#/components/messages/UserFlow'
+components:
+  messages:
+    UserFlow:
+      payload:
+        type: object
+        properties:
+          status:
+            type: string
+            enum:
+              - available
+              - busy
+            description: Status of the user
+          duration:
+            type: number
+            format: int
+            description: Duration of the task
+          task:
+            type: string
+            description: What the user is working on

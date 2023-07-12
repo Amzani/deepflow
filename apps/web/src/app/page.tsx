@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Countdown from '@/components/Countdown'
 import { useState } from 'react';
+import Button from '@/components/Button';
 
 export default function Home() {
   const [isFocused, setIsFocused] = useState(true)
@@ -10,6 +11,7 @@ export default function Home() {
   const isFocusedStyle = isFocused ? "text-black bg-white font-extrabold" : "text-white border-2"
   const setIsBreakStyle = isBreak ? "text-black bg-white font-extrabold" : "text-white border-2"
   const [selectedDuration, setSelectedDuration] = useState(1500)
+  const [task, setTask] = useState('')
   const [start, setStart] = useState(false)
   const durations = [
     {
@@ -67,6 +69,19 @@ export default function Home() {
     target: any; preventDefault: () => void; 
 }) => {
     setStart(!start);
+    try {
+      const wsClient = new WebSocket("ws://localhost:3002")
+      wsClient.onopen = () => {
+        console.log("connected to websocket", start)
+        wsClient.send(JSON.stringify({
+          status: start ? "available" : "busy",
+          duration: selectedDuration,
+          message: task
+        }))
+      }
+    } catch(err) {
+      console.log(err)
+    }
     e.preventDefault();
   }
 
@@ -109,9 +124,11 @@ export default function Home() {
               <div className="text-xl mb-5">Set your objective</div>
               <textarea
                 className="rounded-md text-black form-textarea mt-1 block w-full h-24 mb-7"
+                value={task}
                 rows={3}
                 cols={50}
                 placeholder="Enter some long form content."
+                onChange={(e) => setTask(e.target.value)}
               ></textarea>
           </label>
         </form>
@@ -134,7 +151,6 @@ export default function Home() {
         </div>
         </div>
       </div>
-      
       <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
       </div>
     </main>
