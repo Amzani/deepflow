@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// import sound from '@/assets/Funky-guitar-logo.mp3';
 import useSound from 'use-sound';
-// See https://codesandbox.io/s/reactplaysound-p47gk?file=/src/index.js:61-104
 interface CountdownProps {
   seconds: number;
   start: boolean
