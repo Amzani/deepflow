@@ -1,9 +1,12 @@
 "use client";
 
+import { v4 as uuidv4 } from 'uuid'
 import Image from 'next/image'
 import Countdown from '@/components/Countdown'
-import { useState } from 'react';
-import Button from '@/components/Button';
+import { useState } from 'react'
+import Button from '@/components/Button'
+import { Metadata } from 'next'
+
 
 export default function Home() {
   const [isFocused, setIsFocused] = useState(true)
@@ -14,6 +17,10 @@ export default function Home() {
   const [task, setTask] = useState('')
   const [start, setStart] = useState(false)
   const durations = [
+    {
+      label: "10s",
+      value: 10,
+    },
     {
       label: "5 min",
       value: 300,
@@ -62,6 +69,9 @@ export default function Home() {
 }) => {
     console.log(e.target.value, Number(e.target.value))
     setSelectedDuration(Number(e.target.value))
+    setIsBreak(isBreak)
+    setIsFocused(isFocused)
+    setStart(false)
     e.preventDefault();
   }
 
@@ -74,9 +84,12 @@ export default function Home() {
       wsClient.onopen = () => {
         console.log("connected to websocket", start)
         wsClient.send(JSON.stringify({
+          eventId: uuidv4(),
           status: start ? "available" : "busy",
           duration: selectedDuration,
-          message: task
+          availableIn : !start ? (Date.now() + selectedDuration*1000) : null,
+          message: task,
+          username: "samir"
         }))
       }
     } catch(err) {
